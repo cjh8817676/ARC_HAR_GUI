@@ -6,19 +6,30 @@
 """
 Test the speed of rapidly updating multiple plot curves
 """
-
+from datetime import datetime
 import serial
 from pyqtgraph.Qt import QtGui, QtCore
 import numpy as np
 import pyqtgraph as pg
 from time import perf_counter
 from threading import Thread, Event
-
+import time # 引入time
+# import model
 bserial = serial.Serial(port='COM7', baudrate=38400, timeout=0, parity=serial.PARITY_NONE, stopbits=1)
 l1 = []
 l2 = []
 l3 = []
-predict = ''
+predict = b'\x00'
+user = "18"
+action ="Walking"
+path = './'+action+".txt"
+f = open(path, 'w')    
+
+# Harnet = model.HalNet()
+# Harnet.build((None,50,3,1))
+# Harnet.compile(loss='categorical_crossentropy', optimizer="Adam", metrics=['accuracy'])
+# Harnet.load_weights('./one_input_gru/one_input_gru')
+
 def blue_receive():
     global predict
     global l1 
@@ -70,49 +81,44 @@ def blue_receive():
                     z
                     )   
                 )
+                # now = datetime.now()
+                # s = datetime.strftime(now, '%Y-%m-%d %H:%M:%S')
+                # timeString = s # 時間格式為字串
+                # struct_time = time.strptime(timeString, "%Y-%m-%d %H:%M:%S") # 轉成時間元組
+                # time_stamp = int(time.mktime(struct_time)) # 轉成時間戳
+                # f.write(user+","+action+","+str(time_stamp)+",{}{},{}{},{}{}\n".format('+' if a[3] else '-', x,'+' if a[7] else '-', y,'+' if a[11] else '-', z))
                 #print(s)
                 if a[3] == 0:
                     x = -1*x
                 if a[7] == 0:
-                    y = -1*y
+                    y = -1*y 
                 if a[11] == 0:
                     z = -1*z    
-                
                 l1.append(x)
                 l2.append(z)
                 l3.append(y)  
                 #serialPort.write(b"\r\n")
             if ((a[1] <<8 | a[2]) >= 300):
                 predict = bserial.read() # 1ms
-                print(predict)
-
-
+                print('predict',predict)
+                #preditct = Harnet.predict()
+label_class = ['Stairs','Jogging','Sitting','Walking','Stairs','Walking','Standing','Sitting']
 
 win = pg.GraphicsLayoutWidget(show=True)
-win.setWindowTitle('pyqtgraph example: Scrolling Plots')
-
-
+win.setWindowTitle(label_class[int(predict.hex())])
 p1= win.addPlot()
+
 curve1 = p1.plot(l1,pen=pg.mkPen('r', width=1))
 curve2 = p1.plot(l2,pen=pg.mkPen('g', width=1))
 curve3 = p1.plot(l3,pen=pg.mkPen('b', width=1))
 ptr1 = 0
-
-
 '''
 l1 = [1,2,3,4,5,6,7,8,9,10]
 l1[:-1] => [1,2,3,4,5,6,7,8,9]
 l1[:1] => [1] 
 '''
-
-
 def update1():
     global ptr1, l1,l2,l3, predict
-    label_class = ['Stairs','Jogging','Sitting','Walking','Stairs','Walking','Standing','Sitting']
-    try:
-        pg.plotWidget_ted.setTitle( label_class[int(predict.hex())] )
-    except:
-        pass
 
     l1[:-1] = l1[1:]
     l2[:-1] = l2[1:]
@@ -131,8 +137,6 @@ def update1():
 timer = pg.QtCore.QTimer()
 timer.timeout.connect(update1)
 timer.start(50)
-
-
 
 if __name__ == '__main__':
     import sys
