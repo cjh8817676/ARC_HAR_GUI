@@ -30,7 +30,7 @@ class Window(QtGui.QWidget,threading.Thread):
         # 设置该控件尺寸和相对位置
         self.plotWidget_ted.setGeometry(QtCore.QRect(0,0,800,500))
         self.plotWidget_ted.addLegend()
-        self.label_class = ['Stairs','Jogging','Sitting','Standing','Stairs','Walking']
+        self.label_class = ['DStairs','Jogging','Sitting','Standing','UStairs','Walking']
 
         # 设定定时器
         self.timer = pq.QtCore.QTimer()
@@ -47,8 +47,8 @@ class Window(QtGui.QWidget,threading.Thread):
         self.t = threading.Thread(target= self.blue_receive)
         self.t.start()
         self.curve1 = self.plotWidget_ted.plot(self.l1, name="x",pen=pg.mkPen('r', width=1))
-        self.curve2 = self.plotWidget_ted.plot(self.l2, name="z",pen=pg.mkPen('g', width=1))
-        self.curve3 = self.plotWidget_ted.plot(self.l3, name="y",pen=pg.mkPen('b', width=1))
+        self.curve2 = self.plotWidget_ted.plot(self.l2, name="y",pen=pg.mkPen('g', width=1))
+        self.curve3 = self.plotWidget_ted.plot(self.l3, name="z",pen=pg.mkPen('b', width=1))
         self.ptr1 = 0
         
     def update_data(self):
