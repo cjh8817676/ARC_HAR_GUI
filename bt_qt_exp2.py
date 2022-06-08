@@ -30,7 +30,7 @@ class Window(QtGui.QWidget,threading.Thread):
         # 设置该控件尺寸和相对位置
         self.plotWidget_ted.setGeometry(QtCore.QRect(0,0,800,500))
         self.plotWidget_ted.addLegend()
-        self.label_class = ['DStairs','Jogging','Sitting','Standing','UStairs','Walking']
+        self.label_class = ['Jogging','Sitting','Standing','Walking']
 
         # 设定定时器
         self.timer = pq.QtCore.QTimer()
@@ -39,7 +39,7 @@ class Window(QtGui.QWidget,threading.Thread):
         # 定时器间隔50ms，可以理解为 50ms 刷新一次数据
         self.timer.start(50)
         self.act = 0
-        self.bserial = serial.Serial(port='COM7', baudrate=38400, timeout=0, parity=serial.PARITY_NONE, stopbits=1)
+        self.bserial = serial.Serial(port='COM5', baudrate=38400, timeout=0, parity=serial.PARITY_NONE, stopbits=1)
         self.l1 = []
         self.l2 = []
         self.l3 = []
@@ -97,7 +97,7 @@ class Window(QtGui.QWidget,threading.Thread):
                 while(1):
                     c = self.bserial.read() # 1ms  hc-05
                     #c = self.connection.rx_data  
-                    #print(c)
+                    print(c)
                     count += 1
                     if(c != b''):
                         #print(c)
@@ -143,7 +143,7 @@ class Window(QtGui.QWidget,threading.Thread):
                     self.l2.append(z)
                     self.l3.append(y)  
                     #serialPort.write(b"\r\n")
-                if ((a[1] <<8 | a[2]) == 300):
+                if ((a[1] <<8 | a[2]) == 128):
                     while(1):
                         predict = self.bserial.read() # 1ms
                         if predict != b'':

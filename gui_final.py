@@ -16,7 +16,7 @@ y_datas = [initial_val]*128
 z_datas = [initial_val]*128
 label_class = ['Jogging','Sitting','Standing','Walking']
 def blue(stop):
-    s = serial.Serial(port='COM7',
+    s = serial.Serial(port='COM5',
                   baudrate=38400,
                   timeout=0,
                   parity=serial.PARITY_NONE,

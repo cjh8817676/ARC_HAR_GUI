@@ -14,16 +14,16 @@ initial_val = WINDOW_HEIGHT-4*50
 x_datas = [initial_val]*300
 y_datas = [initial_val]*300
 z_datas = [initial_val]*300
-label_class = ['DStairs','Jogging','Sitting','Standing','UStairs','Walking']
+label_class = ['Jogging','Sitting','Standing','Walking']
 def blue(stop):
-    s = serial.Serial(port='COM7',
+    s = serial.Serial(port='COM5',
                   baudrate=38400,
                   timeout=0,
                   parity=serial.PARITY_NONE,
                   stopbits=1)
-    global x_datas,y_datas,z_datas,model_predict,step_count
     s.write(b'egg')   #hc-05
     s.write(b"\r\n")  #hc-05
+    global x_datas,y_datas,z_datas,model_predict,step_count
     window = b''
     while True:
         if stop():
@@ -38,7 +38,7 @@ def blue(stop):
         if len(window) == 17 and window[15] == 255 and window[16] == 255:
 
             number_of_data = window[1] << 8 | window[2]
-            if number_of_data > 300:
+            if number_of_data > 128:
                 # illegal data ( when frac_part == 0xffff )
                 continue
             x = window[4] + (window[6] << 8 | window[5]) * 0.001
@@ -59,17 +59,28 @@ def blue(stop):
             y_datas = y_datas[1:]
             z_datas = z_datas[1:]
             
-            if number_of_data == 300:
+            if number_of_data == 128:
                 while True:
                     c = s.read()
                     if c != b'':
                         print(" " * 45, "Model predict :", c)
-                        # model_predict = c
                         model_predict = label_class[int(c.hex())]
-                        
-                        # TODO: add step count data
-                        step_count += 1
                         break
+                # TODO: add step count data
+                step_temp = b''
+                while True:
+                    c = s.read()
+                    if c != b'':
+                        print("step predict low:",c)
+                        step_temp+=c
+                        break
+                while True:
+                    c = s.read()
+                    if c != b'':
+                        print("step predict hight:",c)
+                        step_temp+=c
+                        break
+                step_count = step_temp[1]<< 8 | step_temp[0]
 
 class App():
     def __init__(self):
